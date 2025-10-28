@@ -26,6 +26,7 @@ def extract_next_links(url, resp):
     url_found = set()
 
     print ("Extracting links from:", url)
+    print ("Response Content:\n", resp.raw_response.content)
 
     url_push = set()
     for urls in url_found:
