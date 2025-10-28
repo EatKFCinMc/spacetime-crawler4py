@@ -23,6 +23,8 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
+    visited_link.add(url)
+
     url_found = set()
 
     print ("Extracting links from:", url)
