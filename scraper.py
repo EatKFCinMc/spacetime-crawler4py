@@ -17,7 +17,7 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    with open("temp", "wb") as f:
+    with open("temp", "w") as f:
         f.write(url)
         f.write("\n\n\n")
         f.write(resp.raw_response.content)
