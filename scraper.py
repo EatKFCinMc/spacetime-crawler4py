@@ -23,9 +23,17 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
+    url_found = set()
+
     print ("Extracting links from:", url)
 
-    return list()
+    url_push = set()
+    for urls in url_found:
+        if urls not in visited_link:
+            url_push.add(urls)
+            visited_link.add(urls)
+
+    return list(url_push)
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
