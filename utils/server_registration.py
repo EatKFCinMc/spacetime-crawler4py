@@ -1,5 +1,5 @@
 import os
-from spacetime import Node
+from packages.spacetime.node import Node
 from utils.pcc_models import Register
 
 def init(df, user_agent, fresh):
