@@ -65,12 +65,15 @@ def extract_next_links(url, resp):
     for match in url_pattern.findall(html_data):
         urls_before_process.append(match[0] or match[1])
 
+    valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
     for link in urls_before_process:
         link = link.split('#')[0].strip()
 
         if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
             continue
-        if link.count("/") > 10:
+        if link.count("/") > 4:
+            continue
+        if not any(domain in link for domain in valid_domains):
             continue
         if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/"]):
             continue
