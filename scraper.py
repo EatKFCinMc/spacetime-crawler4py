@@ -39,13 +39,9 @@ def extract_next_links(url, resp):
     urls = [a['href'] for a in html.find_all('a', href=True)]
     print(urls)
 
-    try:
-        html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
-    except Exception:
-        return []
-    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html_data)).strip()
+    text = html.get_text()
 
-    if len(text) / max(len(html_data), 1) < 0.1:
+    if len(text) / max(len(html), 1) < 0.1:
         return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
@@ -65,10 +61,10 @@ def is_valid(url):
             return False
 
         domains = (".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu")
-        if not any(parsed.hostname.endswith(domain) for domain in domains):
+        if not any(parsed.hostname.endswith(d) for d in domains):
             return False
 
-        loops = [r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}', r'\d{10,}']
+        loops = [r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}']
         if any(re.search(p, url.lower()) for p in loops):
             return False
 
