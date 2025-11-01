@@ -67,9 +67,9 @@ def is_valid(url):
         if not any(parsed.hostname.endswith(domain) for domain in domains):
             return False
 
-        # loops = (r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}', r'\d{10,}')
-        # if any(re.search(p, url.lower()) for p in loops):
-        #     return False
+        loops = (r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}', r'\d{10,}')
+        if any(re.search(p, url.lower()) for p in loops):
+            return False
 
         # query = ("/event")
         # if any(re.search(p, url.lower()) for p in query):
