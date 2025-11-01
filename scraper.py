@@ -37,8 +37,7 @@ def extract_next_links(url, resp):
 
     html = BeautifulSoup(resp.raw_response.content, 'html.parser')
     urls = [a['href'] for a in html.find_all('a', href=True)]
-    print(html)
-    print(type(html))
+    print(urls)
 
     try:
         html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
