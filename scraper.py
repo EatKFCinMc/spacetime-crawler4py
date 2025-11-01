@@ -63,10 +63,10 @@ def extract_next_links(url, resp):
     for match in url_pattern.findall(text):
         urls_before_process.append(match[0] or match[1])
 
+    print(urls_before_process)
+
     valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
     for link in urls_before_process:
-        link = link.split('#')[0].strip().lower()
-        print(link)
         parsed = urlparse(link)
 
         if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
