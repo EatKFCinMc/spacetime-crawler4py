@@ -24,7 +24,10 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
-    print(resp.raw_response.content)
+    # print(resp.raw_response.content)
+
+    if resp.status != 200:
+        return []
 
     url_pattern = re.compile(
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
@@ -38,8 +41,7 @@ def extract_next_links(url, resp):
     except Exception:
         return []
 
-    text = re.sub(r"<[^>]+>", " ", html_data)
-    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html_data)).strip()
 
     # Skip pages with too little text or likely error messages
     if len(text) < 50 or re.search(r"(404|not\s*found|error|forbidden)", text, re.I):
