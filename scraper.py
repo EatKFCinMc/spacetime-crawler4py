@@ -24,6 +24,7 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
+    print(resp.raw_response.content)
 
     url_pattern = re.compile(
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
@@ -31,17 +32,6 @@ def extract_next_links(url, resp):
 
     if resp is None or resp.raw_response is None:
         return []
-
-    headers = resp.raw_response.headers
-    if "text/html" not in headers.get("Content-Type", "").lower():
-        return []
-
-    try:
-        size = int(headers.get("Content-Length", 0))
-        if size > 1_000_000:
-            return []
-    except ValueError:
-        pass
 
     try:
         html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
