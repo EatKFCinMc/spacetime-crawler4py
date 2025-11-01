@@ -25,6 +25,10 @@ def extract_next_links(url, resp):
         f.write("\n\n")
     """
 
+    status = getattr(resp.raw_response, "status", None)
+    if status is None or status != 200:
+        return []
+
     url_pattern = re.compile(
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
     )
