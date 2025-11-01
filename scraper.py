@@ -23,11 +23,18 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
+    if resp is None or resp.raw_response is None:
+        return []
+
     url_pattern = re.compile(
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
     )
 
-    html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
+    try:
+        html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
+    except Exception:
+        return []
+
     urls = []
     for match in url_pattern.findall(html_data):
         urls.append(match[0] or match[1])
