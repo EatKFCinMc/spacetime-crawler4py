@@ -76,7 +76,7 @@ def extract_next_links(url, resp):
             continue
         if not any(domain in link for domain in valid_domains):
             continue
-        if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/"]):
+        if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/", "/Classes/"]):
             continue
         if re.search(r"/20\d{2}/\d{2}", link):
             continue
