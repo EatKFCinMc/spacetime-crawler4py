@@ -1,6 +1,7 @@
 import re
 from urllib.parse import urlparse
 from hashlib import sha256
+from bs4 import BeautifulSoup
 
 seen_hashes = set()
 
@@ -35,15 +36,14 @@ def extract_next_links(url, resp):
     if resp is None or resp.raw_response is None:
         return []
 
+    html = BeautifulSoup(resp.raw_response.content, 'html.parser')
+    urls = [a['href'] for a in html.find_all('a', href=True)]
+
     try:
         html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
     except Exception:
         return []
-
     text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html_data)).strip()
-
-    if len(text) < 50 or re.search(r"(404|not\s*found|error|forbidden)", text, re.I):
-        return []
 
     if len(text) / max(len(html_data), 1) < 0.1:
         return []
@@ -52,35 +52,6 @@ def extract_next_links(url, resp):
     if content_hash in seen_hashes:
         return []
     seen_hashes.add(content_hash)
-
-    urls_before_process = []
-    urls = []
-
-    url_pattern = re.compile(
-        r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
-    )
-
-    for match in url_pattern.findall(text):
-        urls_before_process.append(match[0] or match[1])
-
-    # print(urls_before_process)
-
-    valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
-    for link in urls_before_process:
-        # parsed = urlparse(link)
-
-        if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
-            continue
-        if link.count("/") > 4:
-            continue
-        # if not any(domain in parsed.netloc for domain in valid_domains):
-        #     print(parsed.netloc)
-        #     continue
-        if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/", "/Classes/"]):
-            continue
-
-        urls.append(link)
-
 
     return list(urls)
 
@@ -92,6 +63,11 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+        valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
+        if not any(parsed.hostname.endswith(domain) for domain in valid_domains):
+            return False
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
