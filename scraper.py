@@ -37,8 +37,6 @@ def extract_next_links(url, resp):
 
     html = BeautifulSoup(resp.raw_response.content, 'html.parser')
     urls = [a['href'] for a in html.find_all('a', href=True)]
-    print(urls)
-
     text = html.get_text()
 
     if len(text) / max(len(html), 1) < 0.1:
