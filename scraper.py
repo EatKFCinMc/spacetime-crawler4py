@@ -27,8 +27,8 @@ def extract_next_links(url, resp):
     # print(resp.raw_response.content)
 
     # Remove response with status code other than 200
-    print("Extracting from: ", url)
-    print("Status code: ", resp.status)
+    print("Extracting from: ", url, ", Status code: ", resp.status)
+
     if resp.status != 200:
         return []
 
@@ -42,15 +42,12 @@ def extract_next_links(url, resp):
 
     text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html_data)).strip()
 
-    # Skip pages with too little text or likely error messages
     if len(text) < 50 or re.search(r"(404|not\s*found|error|forbidden)", text, re.I):
         return []
 
-    # Skip pages with low text/HTML ratio
     if len(text) / max(len(html_data), 1) < 0.1:
         return []
 
-    # Duplicate detection via hash
     content_hash = sha256(text.encode("utf-8")).hexdigest()
     if content_hash in seen_hashes:
         return []
@@ -63,22 +60,21 @@ def extract_next_links(url, resp):
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
     )
 
-    for match in url_pattern.findall(html_data):
+    for match in url_pattern.findall(text):
         urls_before_process.append(match[0] or match[1])
 
     valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
     for link in urls_before_process:
-        link = link.split('#')[0].strip()
+        link = link.split('#')[0].strip().lower()
+        parsed = urlparse(link)
 
         if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
             continue
         if link.count("/") > 4:
             continue
-        if not any(domain in link for domain in valid_domains):
+        if not any(domain in parsed.hostname for domain in valid_domains):
             continue
         if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/", "/Classes/"]):
-            continue
-        if re.search(r"/20\d{2}/\d{2}", link):
             continue
 
         urls.append(link)
