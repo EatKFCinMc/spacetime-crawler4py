@@ -58,7 +58,6 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        print(parsed.hostname)
         domains = (".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu")
         if not any(parsed.hostname.endswith(d) for d in domains):
             return False
@@ -67,9 +66,9 @@ def is_valid(url):
         if any(re.search(p, url.lower()) for p in loops):
             return False
 
-        query = ("/event")
-        if any(re.search(p, url.lower()) for p in query):
-            return False
+        # query = ("/event")
+        # if any(re.search(p, url.lower()) for p in query):
+        #     return False
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
