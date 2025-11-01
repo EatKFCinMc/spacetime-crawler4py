@@ -66,6 +66,10 @@ def is_valid(url):
         if any(re.search(p, url.lower()) for p in loops):
             return False
 
+        reductant = ['?.ical=']
+        if any(r in url.lower() for r in reductant):
+            return False
+
         # query = ("/event")
         # if any(re.search(p, url.lower()) for p in query):
         #     return False
