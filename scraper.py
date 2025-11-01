@@ -73,6 +73,7 @@ def extract_next_links(url, resp):
         if link.count("/") > 4:
             continue
         if not any(domain in parsed.hostname for domain in valid_domains):
+            print(parsed.hostname)
             continue
         if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/", "/Classes/"]):
             continue
