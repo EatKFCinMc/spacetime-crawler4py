@@ -28,7 +28,6 @@ def extract_next_links(url, resp):
     # print(resp.raw_response.content)
 
     # Remove response with status code other than 200
-    print("Extracting from: ", url, ", Status code: ", resp.status)
 
     if resp.status != 200:
         return []
@@ -55,6 +54,10 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         parsed = urlparse(url)
+
+        if parsed.hostname is None:
+            return False
+
         if parsed.scheme not in set(["http", "https"]):
             return False
 
@@ -66,7 +69,7 @@ def is_valid(url):
         if any(re.search(p, url.lower()) for p in loops):
             return False
 
-        reductant = ['?.ical=']
+        reductant = ['ical', 'outlook-ical']
         if any(r in url.lower() for r in reductant):
             return False
 
