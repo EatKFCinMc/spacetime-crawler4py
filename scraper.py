@@ -74,9 +74,10 @@ def is_valid(url):
         if any(r in url.lower() for r in reductant):
             return False
 
-        # query = ("/event")
-        # if any(re.search(p, url.lower()) for p in query):
-        #     return False
+        query_blacklist = ['/events/']
+        print(parsed.query.lower())
+        if any(q in parsed.query.lower for q in query_blacklist):
+            return False
 
         if not validators.url(url):
             return False
