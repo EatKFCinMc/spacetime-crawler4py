@@ -1,7 +1,8 @@
 import re
 from urllib.parse import urlparse
+from hashlib import sha256
 
-visited_link = set()
+seen_hashes = set()
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -23,21 +24,62 @@ def extract_next_links(url, resp):
         f.write(type(resp.raw_response.content))
         f.write("\n\n")
     """
-    if resp is None or resp.raw_response is None:
-        return []
 
     url_pattern = re.compile(
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
     )
+
+    if resp is None or resp.raw_response is None:
+        return []
+
+    headers = resp.raw_response.headers
+    if "text/html" not in headers.get("Content-Type", "").lower():
+        return []
+
+    try:
+        size = int(headers.get("Content-Length", 0))
+        if size > 1_000_000:
+            return []
+    except ValueError:
+        pass
 
     try:
         html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
     except Exception:
         return []
 
+    text = re.sub(r"<[^>]+>", " ", html_data)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    # Skip pages with too little text or likely error messages
+    if len(text) < 50 or re.search(r"(404|not\s*found|error|forbidden)", text, re.I):
+        return []
+
+    # Skip pages with low text/HTML ratio
+    if len(text) / max(len(html_data), 1) < 0.1:
+        return []
+
+    # Duplicate detection via hash
+    content_hash = sha256(text.encode("utf-8")).hexdigest()
+    if content_hash in seen_hashes:
+        return []
+    seen_hashes.add(content_hash)
+
+    urls_before_process = []
     urls = []
+
     for match in url_pattern.findall(html_data):
-        urls.append(match[0] or match[1])
+        urls_before_process.append(match[0] or match[1])
+
+    for link in urls_before_process:
+
+        # Avoid infinite traps
+        if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
+            continue
+        if link.count("/") > 10:
+            continue
+        urls.append(link)
+
 
     return list(urls)
 
