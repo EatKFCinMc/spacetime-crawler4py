@@ -26,13 +26,10 @@ def extract_next_links(url, resp):
     """
     # print(resp.raw_response.content)
 
+    # Remove response with status code other than 200
     print("Status code: ", resp.status)
     if resp.status != 200:
         return []
-
-    url_pattern = re.compile(
-        r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
-    )
 
     if resp is None or resp.raw_response is None:
         return []
@@ -61,16 +58,25 @@ def extract_next_links(url, resp):
     urls_before_process = []
     urls = []
 
+    url_pattern = re.compile(
+        r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
+    )
+
     for match in url_pattern.findall(html_data):
         urls_before_process.append(match[0] or match[1])
 
     for link in urls_before_process:
+        link = link.split('#')[0].strip()
 
-        # Avoid infinite traps
         if re.search(r"([?&]page=\d+)|([?&]session)|([?&]sid=)|(\d{4}/\d{2}/\d{2})", link, re.I):
             continue
         if link.count("/") > 10:
             continue
+        if any(pat in link for pat in ["/wp-json/", "/feed", "/oembed/"]):
+            continue
+        if re.search(r"/20\d{2}/\d{2}", link):
+            continue
+
         urls.append(link)
 
 
