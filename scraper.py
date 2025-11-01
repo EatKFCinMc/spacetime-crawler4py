@@ -27,8 +27,9 @@ def extract_next_links(url, resp):
         r'''(?i)\b(?:href|src)\s*=\s*["']([^"']+)["']|((?:https?|ftp)://[^\s"'<>]+)'''
     )
 
+    html_data = resp.raw_response.content.decode('utf-8', errors='ignore')
     urls = []
-    for match in url_pattern.findall(resp.raw_response.content):
+    for match in url_pattern.findall(html_data):
         urls.append(match[0] or match[1])
 
     return list(urls)
