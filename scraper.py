@@ -27,6 +27,7 @@ def extract_next_links(url, resp):
     # print(resp.raw_response.content)
 
     # Remove response with status code other than 200
+    print("Extracting from: ", url)
     print("Status code: ", resp.status)
     if resp.status != 200:
         return []
