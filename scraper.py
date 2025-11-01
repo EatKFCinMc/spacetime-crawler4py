@@ -2,6 +2,7 @@ import re
 from urllib.parse import urlparse
 from hashlib import sha256
 from bs4 import BeautifulSoup
+import validators
 
 seen_hashes = set()
 
@@ -76,6 +77,9 @@ def is_valid(url):
         # query = ("/event")
         # if any(re.search(p, url.lower()) for p in query):
         #     return False
+
+        if not validators.url(url):
+            return False
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
