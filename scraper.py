@@ -32,7 +32,6 @@ def extract_next_links(url, resp):
 
     if resp.status != 200:
         return []
-
     if resp is None or resp.raw_response is None:
         return []
 
@@ -66,6 +65,14 @@ def is_valid(url):
 
         valid_domains = ("ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu")
         if not any(parsed.hostname.endswith(domain) for domain in valid_domains):
+            return False
+
+        loops = [r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}', r'\d{10,}']
+        if any(re.search(p, url.lower()) for p in loops):
+            return False
+
+        query = ["/event"]
+        if any(re.search(p, url.lower()) for p in query):
             return False
 
         return not re.match(
