@@ -47,7 +47,12 @@ def extract_next_links(url, resp):
         return []
     seen_hashes.add(content_hash)
 
-    return list(urls)
+    finalurls = []
+    for url in urls:
+        url = url.split('#')[0]
+        finalurls.append(url)
+
+    return list(finalurls)
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
