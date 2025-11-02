@@ -54,6 +54,9 @@ def is_valid(url):
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
     try:
+        if not validators.url(url):
+            return False
+
         parsed = urlparse(url)
 
         if parsed.hostname is None:
@@ -81,9 +84,6 @@ def is_valid(url):
         # query_blacklist = ['/events/']
         # if any(q in parsed.query.lower for q in query_blacklist):
         #     return False
-
-        if not validators.url(url):
-            return False
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
