@@ -77,7 +77,7 @@ def is_valid(url):
         if any(r in url.lower() for r in reductant):
             return False
 
-        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP']
+        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP', "login", "signup", "register"]
         if any(b in url.lower() for b in blacklist):
             return False
 
