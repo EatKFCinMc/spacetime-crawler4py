@@ -1,7 +1,7 @@
 import validators
 from bs4 import BeautifulSoup
 
-with open("test_text2.html", "r") as f:
+with open("test_text.html", "r") as f:
     raw_html = f.read()
     html = BeautifulSoup(raw_html, 'html.parser')
     urls = [a['href'] for a in html.find_all('a', href=True)]
