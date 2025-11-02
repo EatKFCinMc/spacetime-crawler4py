@@ -82,7 +82,7 @@ def is_valid(url):
         # if any(q in parsed.query.lower for q in query_blacklist):
         #     return False
 
-        if not validators.url(url):
+        if isinstance(validators.ValidationFailure, validators.url(url)):
             return False
 
         return not re.match(

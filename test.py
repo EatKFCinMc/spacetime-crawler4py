@@ -1,4 +1,4 @@
-
+import validators
 from bs4 import BeautifulSoup
 
 with open("test_text.html", "r") as f:
@@ -10,3 +10,5 @@ with open("test_text.html", "r") as f:
     print(len(text))
     print(len(raw_html))
     print(len(text) / len(raw_html))
+
+print(validators.url("http://your_ip:8080/TomcatFormReCaptcha"))
