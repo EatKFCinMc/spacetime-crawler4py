@@ -39,8 +39,8 @@ def extract_next_links(url, resp):
     urls = [a['href'] for a in html.find_all('a', href=True)]
     text = html.get_text()
 
-    if len(text) / len(resp.raw_response) < 0.1:
-        return []
+    # if len(text) / len(resp.raw_response) < 0.1:
+    #     return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
     if content_hash in seen_hashes:
