@@ -50,6 +50,7 @@ def extract_next_links(url, resp):
     finalurls = []
     for url in urls:
         url = url.split('#')[0]
+        print(url)
         finalurls.append(url)
 
     return list(finalurls)
@@ -82,7 +83,7 @@ def is_valid(url):
         if any(r in url.lower() for r in reductant):
             return False
 
-        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP', "login", "signup", "register"]
+        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP', "login", "signup", "register", "ngs.ics.uci.edu"]
         if any(b in url.lower() for b in blacklist):
             return False
 
