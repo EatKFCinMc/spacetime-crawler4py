@@ -67,15 +67,15 @@ def is_valid(url):
         if not any(parsed.hostname.endswith(d) for d in domains):
             return False
 
-        loops = [r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}']
-        if any(re.search(p, url.lower()) for p in loops):
-            return False
+        # loops = [r'page=\d{3,}', r'offset=\d{3,}', r'sessionid=\w{10,}']
+        # if any(re.search(p, url.lower()) for p in loops):
+        #     return False
 
         reductant = ['ical', 'outlook-ical', "?share"]
         if any(r in url.lower() for r in reductant):
             return False
 
-        blacklist = ['YOUR-AWS-PUBLIC-IP', 'YOUR_IP']
+        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP']
         if any(b in url.lower() for b in blacklist):
             return False
 
