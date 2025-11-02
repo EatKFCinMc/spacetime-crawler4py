@@ -40,7 +40,7 @@ def extract_next_links(url, resp):
     text = html.get_text()
 
     print(len(text) / len(resp.raw_response.text))
-    if len(text) / len(resp.raw_response.text) < 0.1:
+    if len(text) / len(resp.raw_response.text) < 0.01:
         return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
