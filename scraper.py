@@ -39,7 +39,7 @@ def extract_next_links(url, resp):
     urls = [a['href'] for a in html.find_all('a', href=True)]
     text = html.get_text()
 
-    if len(text) / max(len(html), 1) < 0.1:
+    if len(text) / len(resp.raw_response) < 0.1:
         return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
@@ -74,10 +74,13 @@ def is_valid(url):
         if any(r in url.lower() for r in reductant):
             return False
 
-        query_blacklist = ['/events/']
-        print(parsed.query.lower())
-        if any(q in parsed.query.lower for q in query_blacklist):
+        blacklist = ['wics.ics.uci.edu/events/']
+        if any(b in url.lower() for b in blacklist):
             return False
+
+        # query_blacklist = ['/events/']
+        # if any(q in parsed.query.lower for q in query_blacklist):
+        #     return False
 
         if not validators.url(url):
             return False
