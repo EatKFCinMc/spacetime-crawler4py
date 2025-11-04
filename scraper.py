@@ -3,14 +3,74 @@ from urllib.parse import urlparse
 from hashlib import sha256
 from bs4 import BeautifulSoup
 import validators
+import json
+import os
+import threading
+
 
 seen_hashes = set()
+file_lock = threading.Lock()
+
+
+def tokenize(text: str) -> list:
+    tokens = []
+    current = ""
+
+    for char in text:
+        if char.isalnum() and char.isascii():
+            current += char
+        else:
+            if current:
+                current = current.lower()
+                current = current.strip()
+                tokens.append(current)
+                current = ""
+    if current:
+        current = current.lower()
+        current = current.strip()
+        tokens.append(current)
+
+    return tokens
+
+
+def computeWordFrequencies(tokens: list) -> dict:
+    res = {}
+    for token in tokens:
+        if token in res:
+            res[token] += 1
+        else:
+            res[token] = 1
+    return res
+
+
+def write_to_file(url: str, text: str):
+    tokens = tokenize(text)
+    curr_word_freq = computeWordFrequencies(tokens)
+    word_freq = {}
+
+    with file_lock:
+        if os.path.exists("word_frequency.json"):
+            with open("word_frequency.json", "r", encoding="utf-8") as f:
+                word_freq = json.load(f)
+
+        for word in curr_word_freq:
+            if word in word_freq:
+                word_freq[word] += curr_word_freq[word]
+            else:
+                word_freq[word] = curr_word_freq[word]
+
+        with open("word_frequency.json", "w", encoding="utf-8") as f:
+            json.dump(word_freq, f, indent=4)
+        with open("urls.txt", "a", encoding="utf-8") as f:
+            f.write(url + "\n")
+
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
-def extract_next_links(url, resp):
+
+def extract_next_links(URL, resp):
     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
@@ -27,8 +87,6 @@ def extract_next_links(url, resp):
         f.write("\n\n")
     """
     # print(resp.raw_response.content)
-
-    # Remove response with status code other than 200
 
     if resp.status != 200:
         return []
@@ -50,10 +108,12 @@ def extract_next_links(url, resp):
     finalurls = []
     for url in urls:
         url = url.split('#')[0]
-        print(url)
         finalurls.append(url)
 
+    write_to_file(URL, text)
+
     return list(finalurls)
+
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
