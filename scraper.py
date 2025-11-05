@@ -43,7 +43,7 @@ def computeWordFrequencies(tokens: list) -> dict:
     return res
 
 
-def write_to_file(url: str, text: str):
+def write_to_file(text: str):
     tokens = tokenize(text)
     curr_word_freq = computeWordFrequencies(tokens)
     word_freq = {}
@@ -61,8 +61,6 @@ def write_to_file(url: str, text: str):
 
         with open("word_frequency.json", "w", encoding="utf-8") as f:
             json.dump(word_freq, f, indent=4)
-        with open("urls.txt", "a", encoding="utf-8") as f:
-            f.write(url + "\n")
 
 
 def scraper(url, resp):
@@ -70,7 +68,7 @@ def scraper(url, resp):
     return [link for link in links if is_valid(link)]
 
 
-def extract_next_links(URL, resp):
+def extract_next_links(url, resp):
     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
@@ -97,7 +95,7 @@ def extract_next_links(URL, resp):
     urls = [a['href'] for a in html.find_all('a', href=True)]
     text = html.get_text()
 
-    if len(text) / len(resp.raw_response.text) < 0.03:
+    if len(text) / len(resp.raw_response.text) < 0.02:
         return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
@@ -110,7 +108,7 @@ def extract_next_links(URL, resp):
         url = url.split('#')[0]
         finalurls.append(url)
 
-    write_to_file(URL, text)
+    write_to_file(text)
 
     return list(finalurls)
 
@@ -143,9 +141,9 @@ def is_valid(url):
         if any(r in url.lower() for r in reductant):
             return False
 
-        blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP', "login", "signup", "register", "ngs.ics.uci.edu"]
-        if any(b in url.lower() for b in blacklist):
-            return False
+        # blacklist = ['wics.ics.uci.edu/events', 'YOUR-AWS-PUBLIC-IP', 'YOUR_IP']
+        # if any(b in url.lower() for b in blacklist):
+        #     return False
 
         # query_blacklist = ['/events/']
         # if any(q in parsed.query.lower for q in query_blacklist):
