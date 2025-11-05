@@ -95,7 +95,7 @@ def extract_next_links(url, resp):
     urls = [a['href'] for a in html.find_all('a', href=True)]
     text = html.get_text()
 
-    if len(text) / len(resp.raw_response.text) < 0.019:
+    if len(text) / len(resp.raw_response.text) < 0.02:
         return []
 
     content_hash = sha256(text.encode("utf-8")).hexdigest()
@@ -137,7 +137,7 @@ def is_valid(url):
         # if any(re.search(p, url.lower()) for p in loops):
         #     return False
 
-        reductant = ['ical', 'outlook-ical', "?share"]
+        reductant = ['ical', 'outlook-ical', "?share", "tribe"]
         if any(r in url.lower() for r in reductant):
             return False
 
@@ -145,9 +145,9 @@ def is_valid(url):
         if any(b in url.lower() for b in blacklist):
             return False
 
-        # query_blacklist = ['/events/']
-        # if any(q in parsed.query.lower for q in query_blacklist):
-        #     return False
+        path_blacklist = ['/events/']
+        if any(q in parsed.path.lower() for q in path_blacklist):
+            return False
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
